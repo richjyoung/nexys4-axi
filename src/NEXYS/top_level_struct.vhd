@@ -1,8 +1,9 @@
 --------------------------------------------------------------------------------
 -- xil_defaultlib/top_level(struct) - Architecture
 --------------------------------------------------------------------------------
-library AXI, IEEE, UNISIM, xil_defaultlib;
+library AXI, ETHERNET, IEEE, UNISIM, xil_defaultlib;
 use AXI.axi_types.all;
+use ETHERNET.ethernet_types.all;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 use UNISIM.VCOMPONENTS.all;
@@ -21,15 +22,12 @@ architecture struct of top_level is
     signal ETH_PHY_MDIO_T       : std_logic;
 
     -- MAC/RMII Converter Interface Signals
-    signal RMII_MAC_COL         : std_logic;
-    signal RMII_MAC_CRS         : std_logic;
-    signal RMII_MAC_RX_DV       : std_logic;
-    signal RMII_MAC_RX_CLK      : std_logic;
-    signal RMII_MAC_RXD         : std_logic_vector(3 downto 0);
-    signal RMII_MAC_RX_ER       : std_logic;
-    signal RMII_MAC_TX_CLK      : std_logic;
-    signal MAC_RMII_TXD         : std_logic_vector(3 downto 0);
-    signal MAC_RMII_TX_EN       : std_logic;
+    signal RMII_MAC             : T_ETH_MII_PHY_MAC;
+    signal MAC_RMII             : T_ETH_MII_MAC_PHY;
+
+    -- RMII Converter/PHY Interface Signals
+    signal RMII_PHY             : T_ETH_RMII_MAC_PHY;
+    signal PHY_RMII             : T_ETH_RMII_PHY_MAC;
 
     -- JTAG to AXI Converter
     signal JTAG_CONV            : T_AXI4_MASTER_SLAVE_32x32;
@@ -41,8 +39,15 @@ architecture struct of top_level is
 
 begin
 
+
     JTAG_CONV.AWREGION          <= (others => '0');
     JTAG_CONV.ARREGION          <= (others => '0');
+
+    ETH_PHY_TXD                 <= RMII_PHY.TXD;
+    ETH_PHY_TXEN                <= RMII_PHY.TX_EN;
+    PHY_RMII.CRS_DV             <= ETH_PHY_CRSDV;
+    PHY_RMII.RXD                <= ETH_PHY_RXD;
+    PHY_RMII.RX_ER              <= ETH_PHY_RXERR;
 
     U_MDIO : IOBUF
     port map (
@@ -204,21 +209,21 @@ begin
         s_axi_rvalid            => MAC_CONV.RVALID,
 
         -- PHY In
-        phy_col                 => RMII_MAC_COL,
-        phy_crs                 => RMII_MAC_CRS,
-        phy_dv                  => RMII_MAC_RX_DV,
+        phy_col                 => RMII_MAC.COL,
+        phy_crs                 => RMII_MAC.CRS,
+        phy_dv                  => RMII_MAC.RX_DV,
         phy_mdio_i              => ETH_PHY_MDIO_O,
-        phy_rx_clk              => RMII_MAC_RX_CLK,
-        phy_rx_data             => RMII_MAC_RXD,
-        phy_rx_er               => RMII_MAC_RX_ER,
-        phy_tx_clk              => RMII_MAC_TX_CLK,
+        phy_rx_clk              => RMII_MAC.RX_CLK,
+        phy_rx_data             => RMII_MAC.RXD,
+        phy_rx_er               => RMII_MAC.RX_ER,
+        phy_tx_clk              => RMII_MAC.TX_CLK,
         -- PHY Out
         phy_mdc                 => ETH_PHY_MDC,
         phy_mdio_o              => ETH_PHY_MDIO_I,
         phy_mdio_t              => ETH_PHY_MDIO_T,
         phy_rst_n               => ETH_PHY_nRESET,
-        phy_tx_data             => MAC_RMII_TXD,
-        phy_tx_en               => MAC_RMII_TX_EN
+        phy_tx_data             => MAC_RMII.TXD,
+        phy_tx_en               => MAC_RMII.TX_EN
 
     );
 
@@ -228,23 +233,23 @@ begin
         ref_clk                 => CLK_ETH,
         rst_n                   => nRESET,
         
-        mac2rmii_tx_en          => MAC_RMII_TX_EN,
-        mac2rmii_txd            => MAC_RMII_TXD,
+        mac2rmii_tx_en          => MAC_RMII.TX_EN,
+        mac2rmii_txd            => MAC_RMII.TXD,
         mac2rmii_tx_er          => '0',
 
-        rmii2mac_tx_clk         => RMII_MAC_TX_CLK,
-        rmii2mac_rx_clk         => RMII_MAC_RX_CLK,
-        rmii2mac_col            => RMII_MAC_COL,
-        rmii2mac_crs            => RMII_MAC_CRS,
-        rmii2mac_rx_dv          => RMII_MAC_RX_DV,
-        rmii2mac_rx_er          => RMII_MAC_RX_ER,
-        rmii2mac_rxd            => RMII_MAC_RXD,
+        rmii2mac_tx_clk         => RMII_MAC.TX_CLK,
+        rmii2mac_rx_clk         => RMII_MAC.RX_CLK,
+        rmii2mac_col            => RMII_MAC.COL,
+        rmii2mac_crs            => RMII_MAC.CRS,
+        rmii2mac_rx_dv          => RMII_MAC.RX_DV,
+        rmii2mac_rx_er          => RMII_MAC.RX_ER,
+        rmii2mac_rxd            => RMII_MAC.RXD,
 
-        phy2rmii_crs_dv         => ETH_PHY_CRSDV,
-        phy2rmii_rx_er          => ETH_PHY_RXERR,
-        phy2rmii_rxd            => ETH_PHY_RXD,
-        rmii2phy_txd            => ETH_PHY_TXD,
-        rmii2phy_tx_en          => ETH_PHY_TXEN
+        phy2rmii_crs_dv         => PHY_RMII.CRS_DV,
+        phy2rmii_rx_er          => PHY_RMII.RX_ER,
+        phy2rmii_rxd            => PHY_RMII.RXD,
+        rmii2phy_txd            => RMII_PHY.TXD,
+        rmii2phy_tx_en          => RMII_PHY.TX_EN
     );
 end struct;
 --------------------------------------------------------------------------------
