@@ -56,6 +56,7 @@ package axi_types is
         WSTRB(3 downto 0),
         ARADDR(31 downto 0)
     );
+    type T_AXI4_MASTER_SLAVE_32x32_ARRAY is array (natural range <>) of T_AXI4_MASTER_SLAVE_32x32;
 
     type T_AXI4_SLAVE_MASTER is record
         -- Write Address Channel
@@ -79,7 +80,8 @@ package axi_types is
     subtype T_AXI4_SLAVE_MASTER_32x32 is T_AXI4_SLAVE_MASTER(
         RDATA(31 downto 0)
     );
-
+    type T_AXI4_SLAVE_MASTER_32x32_ARRAY is array (natural range <>) of T_AXI4_SLAVE_MASTER_32x32;
+    
 
     type T_AXI4LITE_MASTER_SLAVE is record
         -- Write Address Channel

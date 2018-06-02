@@ -183,6 +183,108 @@ package components is
     );
     END COMPONENT;
 
+    COMPONENT axi_uartlite_115200_8_n_1
+    PORT (
+        s_axi_aclk : IN STD_LOGIC;
+        s_axi_aresetn : IN STD_LOGIC;
+        interrupt : OUT STD_LOGIC;
+        s_axi_awaddr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_awvalid : IN STD_LOGIC;
+        s_axi_awready : OUT STD_LOGIC;
+        s_axi_wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        s_axi_wstrb : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_wvalid : IN STD_LOGIC;
+        s_axi_wready : OUT STD_LOGIC;
+        s_axi_bresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        s_axi_bvalid : OUT STD_LOGIC;
+        s_axi_bready : IN STD_LOGIC;
+        s_axi_araddr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_arvalid : IN STD_LOGIC;
+        s_axi_arready : OUT STD_LOGIC;
+        s_axi_rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        s_axi_rresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        s_axi_rvalid : OUT STD_LOGIC;
+        s_axi_rready : IN STD_LOGIC;
+        rx : IN STD_LOGIC;
+        tx : OUT STD_LOGIC
+    );
+    END COMPONENT;
+
+    COMPONENT axi_crossbar_1x2_32x32
+    PORT (
+        aclk : IN STD_LOGIC;
+        aresetn : IN STD_LOGIC;
+        s_axi_awaddr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        s_axi_awlen : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        s_axi_awsize : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        s_axi_awburst : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        s_axi_awlock : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_awcache : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_awprot : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        s_axi_awqos : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_awvalid : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_awready : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        s_axi_wstrb : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_wlast : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_wvalid : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_wready : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_bresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        s_axi_bvalid : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_bready : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_araddr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        s_axi_arlen : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        s_axi_arsize : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        s_axi_arburst : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        s_axi_arlock : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_arcache : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_arprot : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        s_axi_arqos : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        s_axi_arvalid : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_arready : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        s_axi_rresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        s_axi_rlast : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_rvalid : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+        s_axi_rready : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        m_axi_awaddr : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        m_axi_awlen : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+        m_axi_awsize : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+        m_axi_awburst : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        m_axi_awlock : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_awcache : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        m_axi_awprot : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+        m_axi_awregion : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        m_axi_awqos : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        m_axi_awvalid : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_awready : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_wdata : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        m_axi_wstrb : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        m_axi_wlast : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_wvalid : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_wready : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_bresp : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        m_axi_bvalid : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_bready : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_araddr : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        m_axi_arlen : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+        m_axi_arsize : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+        m_axi_arburst : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        m_axi_arlock : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_arcache : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        m_axi_arprot : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+        m_axi_arregion : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        m_axi_arqos : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        m_axi_arvalid : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_arready : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_rdata : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+        m_axi_rresp : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        m_axi_rlast : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_rvalid : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        m_axi_rready : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    );
+    END COMPONENT;
+
 end components;
 
 package body components is

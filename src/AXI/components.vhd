@@ -6,6 +6,21 @@ use IEEE.numeric_std.all;
 
 package components is
 
+    component axi_crossbar is
+        port (
+            -- Clock & Reset
+            CLK                 : in  std_logic;
+            nRESET              : in  std_logic;
+            -- AXI Slave Interface
+            S_AXI_IN            : in  T_AXI4_MASTER_SLAVE_32x32;
+            S_AXI_OUT           : out T_AXI4_SLAVE_MASTER_32x32;
+            -- AXI Master Interfaces
+            M_AXI_IN            : in  T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
+            M_AXI_OUT           : out T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0)
+        );
+    end component axi_crossbar;
+
+
     component axi_ethernet_rmii is
         port (
             -- Clock & Reset
@@ -27,6 +42,22 @@ package components is
             S_AXI_OUT           : out   T_AXI4_SLAVE_MASTER_32x32
         );
     end component axi_ethernet_rmii;
+
+    component axi_uart is
+        port (
+            -- Clock & Reset
+            CLK                 : in  std_logic;
+            nRESET              : in  std_logic;
+            -- UART Interrupt
+            UART_IRQ            : out std_logic;
+            -- Management Interface
+            UART_RX             : in  std_logic;
+            UART_TX             : out std_logic;
+            -- AXI Slave Interface
+            S_AXI_IN            : in  T_AXI4_MASTER_SLAVE_32x32;
+            S_AXI_OUT           : out T_AXI4_SLAVE_MASTER_32x32
+        );
+    end component axi_uart;
 
 end components;
 
