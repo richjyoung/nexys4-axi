@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------
 -- xil_defaultlib/top_level(struct) - Architecture
 --------------------------------------------------------------------------------
-library IEEE, UNISIM, xil_defaultlib;
+library AXI, IEEE, UNISIM, xil_defaultlib;
+use AXI.axi_types.all;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 use UNISIM.VCOMPONENTS.all;
@@ -31,41 +32,8 @@ architecture struct of top_level is
     signal MAC_RMII_TX_EN       : std_logic;
 
     -- JTAG to AXI Converter
-    signal JTAG_CONV_AWADDR     : std_logic_vector(31 downto 0);
-    signal JTAG_CONV_AWLEN      : std_logic_vector(7 downto 0);
-    signal JTAG_CONV_AWSIZE     : std_logic_vector(2 downto 0);
-    signal JTAG_CONV_AWBURST    : std_logic_vector(1 downto 0);
-    signal JTAG_CONV_AWLOCK     : std_logic_vector(0 downto 0);
-    signal JTAG_CONV_AWCACHE    : std_logic_vector(3 downto 0);
-    signal JTAG_CONV_AWPROT     : std_logic_vector(2 downto 0);
-    signal JTAG_CONV_AWREGION   : std_logic_vector(3 downto 0);
-    signal JTAG_CONV_AWQOS      : std_logic_vector(3 downto 0);
-    signal JTAG_CONV_AWVALID    : std_logic;
-    signal JTAG_CONV_WDATA      : std_logic_vector(31 downto 0);
-    signal JTAG_CONV_WSTRB      : std_logic_vector(3 downto 0);
-    signal JTAG_CONV_WLAST      : std_logic;
-    signal JTAG_CONV_WVALID     : std_logic;
-    signal JTAG_CONV_BREADY     : std_logic;
-    signal JTAG_CONV_ARADDR     : std_logic_vector(31 downto 0);
-    signal JTAG_CONV_ARLEN      : std_logic_vector(7 downto 0);
-    signal JTAG_CONV_ARSIZE     : std_logic_vector(2 downto 0);
-    signal JTAG_CONV_ARBURST    : std_logic_vector(1 downto 0);
-    signal JTAG_CONV_ARLOCK     : std_logic_vector(0 downto 0);
-    signal JTAG_CONV_ARCACHE    : std_logic_vector(3 downto 0);
-    signal JTAG_CONV_ARPROT     : std_logic_vector(2 downto 0);
-    signal JTAG_CONV_ARREGION   : std_logic_vector(3 downto 0);
-    signal JTAG_CONV_ARQOS      : std_logic_vector(3 downto 0);
-    signal JTAG_CONV_ARVALID    : std_logic;
-    signal JTAG_CONV_RREADY     : std_logic;
-    signal CONV_JTAG_AWREADY    : std_logic;
-    signal CONV_JTAG_WREADY     : std_logic;
-    signal CONV_JTAG_BRESP      : std_logic_vector(1 downto 0);
-    signal CONV_JTAG_BVALID     : std_logic;
-    signal CONV_JTAG_ARREADY    : std_logic;
-    signal CONV_JTAG_RDATA      : std_logic_vector(31 downto 0);
-    signal CONV_JTAG_RRESP      : std_logic_vector(1 downto 0);
-    signal CONV_JTAG_RLAST      : std_logic;
-    signal CONV_JTAG_RVALID     : std_logic;
+    signal JTAG_CONV            : T_AXI4_MASTER_SLAVE_32x32;
+    signal CONV_JTAG            : T_AXI4_SLAVE_MASTER_32x32;
 
     -- AXI Converter to Ethernet MAC
     signal MAC_CONV_AWREADY     : std_logic;
@@ -89,6 +57,9 @@ architecture struct of top_level is
     signal CONV_MAC_RREADY      : std_logic;
 
 begin
+
+    JTAG_CONV.AWREGION          <= (others => '0');
+    JTAG_CONV.ARREGION          <= (others => '0');
 
     U_MDIO : IOBUF
     port map (
@@ -117,44 +88,44 @@ begin
         aresetn                 => nRESET,
         
         -- AXI Master In
-        m_axi_awready           => CONV_JTAG_AWREADY,
-        m_axi_wready            => CONV_JTAG_WREADY,
+        m_axi_awready           => CONV_JTAG.AWREADY,
+        m_axi_wready            => CONV_JTAG.WREADY,
         m_axi_bid               => "0",
-        m_axi_bresp             => CONV_JTAG_BRESP,
-        m_axi_bvalid            => CONV_JTAG_BVALID,
-        m_axi_arready           => CONV_JTAG_ARREADY,
+        m_axi_bresp             => CONV_JTAG.BRESP,
+        m_axi_bvalid            => CONV_JTAG.BVALID,
+        m_axi_arready           => CONV_JTAG.ARREADY,
         m_axi_rid               => "0",
-        m_axi_rdata             => CONV_JTAG_RDATA,
-        m_axi_rresp             => CONV_JTAG_RRESP,
-        m_axi_rlast             => CONV_JTAG_RLAST,
-        m_axi_rvalid            => CONV_JTAG_RVALID,
+        m_axi_rdata             => CONV_JTAG.RDATA,
+        m_axi_rresp             => CONV_JTAG.RRESP,
+        m_axi_rlast             => CONV_JTAG.RLAST,
+        m_axi_rvalid            => CONV_JTAG.RVALID,
         -- AXI Master Out
         m_axi_awid              => open,
-        m_axi_awaddr            => JTAG_CONV_AWADDR,
-        m_axi_awlen             => JTAG_CONV_AWLEN,
-        m_axi_awsize            => JTAG_CONV_AWSIZE,
-        m_axi_awburst           => JTAG_CONV_AWBURST,
-        m_axi_awlock            => JTAG_CONV_AWLOCK(0),
-        m_axi_awcache           => JTAG_CONV_AWCACHE,
-        m_axi_awprot            => JTAG_CONV_AWPROT,
-        m_axi_awqos             => JTAG_CONV_AWQOS,
-        m_axi_awvalid           => JTAG_CONV_AWVALID,
-        m_axi_wdata             => JTAG_CONV_WDATA,
-        m_axi_wstrb             => JTAG_CONV_WSTRB,
-        m_axi_wlast             => JTAG_CONV_WLAST,
-        m_axi_wvalid            => JTAG_CONV_WVALID,
-        m_axi_bready            => JTAG_CONV_BREADY,
+        m_axi_awaddr            => JTAG_CONV.AWADDR,
+        m_axi_awlen             => JTAG_CONV.AWLEN,
+        m_axi_awsize            => JTAG_CONV.AWSIZE,
+        m_axi_awburst           => JTAG_CONV.AWBURST,
+        m_axi_awlock            => JTAG_CONV.AWLOCK,
+        m_axi_awcache           => JTAG_CONV.AWCACHE,
+        m_axi_awprot            => JTAG_CONV.AWPROT,
+        m_axi_awqos             => JTAG_CONV.AWQOS,
+        m_axi_awvalid           => JTAG_CONV.AWVALID,
+        m_axi_wdata             => JTAG_CONV.WDATA,
+        m_axi_wstrb             => JTAG_CONV.WSTRB,
+        m_axi_wlast             => JTAG_CONV.WLAST,
+        m_axi_wvalid            => JTAG_CONV.WVALID,
+        m_axi_bready            => JTAG_CONV.BREADY,
         m_axi_arid              => open,
-        m_axi_araddr            => JTAG_CONV_ARADDR,
-        m_axi_arlen             => JTAG_CONV_ARLEN,
-        m_axi_arsize            => JTAG_CONV_ARSIZE,
-        m_axi_arburst           => JTAG_CONV_ARBURST,
-        m_axi_arlock            => JTAG_CONV_ARLOCK(0),
-        m_axi_arcache           => JTAG_CONV_ARCACHE,
-        m_axi_arprot            => JTAG_CONV_ARPROT,
-        m_axi_arqos             => JTAG_CONV_ARQOS,
-        m_axi_arvalid           => JTAG_CONV_ARVALID,
-        m_axi_rready            => JTAG_CONV_RREADY
+        m_axi_araddr            => JTAG_CONV.ARADDR,
+        m_axi_arlen             => JTAG_CONV.ARLEN,
+        m_axi_arsize            => JTAG_CONV.ARSIZE,
+        m_axi_arburst           => JTAG_CONV.ARBURST,
+        m_axi_arlock            => JTAG_CONV.ARLOCK,
+        m_axi_arcache           => JTAG_CONV.ARCACHE,
+        m_axi_arprot            => JTAG_CONV.ARPROT,
+        m_axi_arqos             => JTAG_CONV.ARQOS,
+        m_axi_arvalid           => JTAG_CONV.ARVALID,
+        m_axi_rready            => JTAG_CONV.RREADY
     );
 
     U_CONV : axi_s_to_axilite_m_32x32_conv
@@ -163,42 +134,42 @@ begin
         aresetn                 => nRESET,
 
         -- Slave AXI In
-        s_axi_awaddr            => JTAG_CONV_AWADDR,
-        s_axi_awlen             => JTAG_CONV_AWLEN,
-        s_axi_awsize            => JTAG_CONV_AWSIZE,
-        s_axi_awburst           => JTAG_CONV_AWBURST,
-        s_axi_awlock            => JTAG_CONV_AWLOCK,
-        s_axi_awcache           => JTAG_CONV_AWCACHE,
-        s_axi_awprot            => JTAG_CONV_AWPROT,
-        s_axi_awregion          => JTAG_CONV_AWREGION,
-        s_axi_awqos             => JTAG_CONV_AWQOS,
-        s_axi_awvalid           => JTAG_CONV_AWVALID,
-        s_axi_wdata             => JTAG_CONV_WDATA,
-        s_axi_wstrb             => JTAG_CONV_WSTRB,
-        s_axi_wlast             => JTAG_CONV_WLAST,
-        s_axi_wvalid            => JTAG_CONV_WVALID,
-        s_axi_bready            => JTAG_CONV_BREADY,
-        s_axi_araddr            => JTAG_CONV_ARADDR,
-        s_axi_arlen             => JTAG_CONV_ARLEN,
-        s_axi_arsize            => JTAG_CONV_ARSIZE,
-        s_axi_arburst           => JTAG_CONV_ARBURST,
-        s_axi_arlock            => JTAG_CONV_ARLOCK,
-        s_axi_arcache           => JTAG_CONV_ARCACHE,
-        s_axi_arprot            => JTAG_CONV_ARPROT,
-        s_axi_arregion          => JTAG_CONV_ARREGION,
-        s_axi_arqos             => JTAG_CONV_ARQOS,
-        s_axi_arvalid           => JTAG_CONV_ARVALID,
-        s_axi_rready            => JTAG_CONV_RREADY,
+        s_axi_awaddr            => JTAG_CONV.AWADDR,
+        s_axi_awlen             => JTAG_CONV.AWLEN,
+        s_axi_awsize            => JTAG_CONV.AWSIZE,
+        s_axi_awburst           => JTAG_CONV.AWBURST,
+        s_axi_awlock(0)         => JTAG_CONV.AWLOCK,
+        s_axi_awcache           => JTAG_CONV.AWCACHE,
+        s_axi_awprot            => JTAG_CONV.AWPROT,
+        s_axi_awregion          => JTAG_CONV.AWREGION,
+        s_axi_awqos             => JTAG_CONV.AWQOS,
+        s_axi_awvalid           => JTAG_CONV.AWVALID,
+        s_axi_wdata             => JTAG_CONV.WDATA,
+        s_axi_wstrb             => JTAG_CONV.WSTRB,
+        s_axi_wlast             => JTAG_CONV.WLAST,
+        s_axi_wvalid            => JTAG_CONV.WVALID,
+        s_axi_bready            => JTAG_CONV.BREADY,
+        s_axi_araddr            => JTAG_CONV.ARADDR,
+        s_axi_arlen             => JTAG_CONV.ARLEN,
+        s_axi_arsize            => JTAG_CONV.ARSIZE,
+        s_axi_arburst           => JTAG_CONV.ARBURST,
+        s_axi_arlock(0)         => JTAG_CONV.ARLOCK,
+        s_axi_arcache           => JTAG_CONV.ARCACHE,
+        s_axi_arprot            => JTAG_CONV.ARPROT,
+        s_axi_arregion          => JTAG_CONV.ARREGION,
+        s_axi_arqos             => JTAG_CONV.ARQOS,
+        s_axi_arvalid           => JTAG_CONV.ARVALID,
+        s_axi_rready            => JTAG_CONV.RREADY,
         -- Slave AXI Out
-        s_axi_awready           => CONV_JTAG_AWREADY,
-        s_axi_wready            => CONV_JTAG_WREADY,
-        s_axi_bresp             => CONV_JTAG_BRESP,
-        s_axi_bvalid            => CONV_JTAG_BVALID,
-        s_axi_arready           => CONV_JTAG_ARREADY,
-        s_axi_rdata             => CONV_JTAG_RDATA,
-        s_axi_rresp             => CONV_JTAG_RRESP,
-        s_axi_rlast             => CONV_JTAG_RLAST,
-        s_axi_rvalid            => CONV_JTAG_RVALID,
+        s_axi_awready           => CONV_JTAG.AWREADY,
+        s_axi_wready            => CONV_JTAG.WREADY,
+        s_axi_bresp             => CONV_JTAG.BRESP,
+        s_axi_bvalid            => CONV_JTAG.BVALID,
+        s_axi_arready           => CONV_JTAG.ARREADY,
+        s_axi_rdata             => CONV_JTAG.RDATA,
+        s_axi_rresp             => CONV_JTAG.RRESP,
+        s_axi_rlast             => CONV_JTAG.RLAST,
+        s_axi_rvalid            => CONV_JTAG.RVALID,
 
         -- Master AXILITE In
         m_axi_awready           => MAC_CONV_AWREADY,
