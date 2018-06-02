@@ -36,25 +36,8 @@ architecture struct of top_level is
     signal CONV_JTAG            : T_AXI4_SLAVE_MASTER_32x32;
 
     -- AXI Converter to Ethernet MAC
-    signal MAC_CONV_AWREADY     : std_logic;
-    signal MAC_CONV_WREADY      : std_logic;
-    signal MAC_CONV_BRESP       : std_logic_vector(1 downto 0);
-    signal MAC_CONV_BVALID      : std_logic;
-    signal MAC_CONV_ARREADY     : std_logic;
-    signal MAC_CONV_RDATA       : std_logic_vector(31 downto 0);
-    signal MAC_CONV_RRESP       : std_logic_vector(1 downto 0);
-    signal MAC_CONV_RVALID      : std_logic;
-    signal CONV_MAC_AWADDR      : std_logic_vector(31 downto 0);
-    signal CONV_MAC_AWPROT      : std_logic_vector(2 downto 0);
-    signal CONV_MAC_AWVALID     : std_logic;
-    signal CONV_MAC_WDATA       : std_logic_vector(31 downto 0);
-    signal CONV_MAC_WSTRB       : std_logic_vector(3 downto 0);
-    signal CONV_MAC_WVALID      : std_logic;
-    signal CONV_MAC_BREADY      : std_logic;
-    signal CONV_MAC_ARADDR      : std_logic_vector(31 downto 0);
-    signal CONV_MAC_ARPROT      : std_logic_vector(2 downto 0);
-    signal CONV_MAC_ARVALID     : std_logic;
-    signal CONV_MAC_RREADY      : std_logic;
+    signal CONV_MAC             : T_AXI4LITE_MASTER_SLAVE_32x32;
+    signal MAC_CONV             : T_AXI4LITE_SLAVE_MASTER_32x32;
 
 begin
 
@@ -172,26 +155,26 @@ begin
         s_axi_rvalid            => CONV_JTAG.RVALID,
 
         -- Master AXILITE In
-        m_axi_awready           => MAC_CONV_AWREADY,
-        m_axi_wready            => MAC_CONV_WREADY,
-        m_axi_bresp             => MAC_CONV_BRESP,
-        m_axi_bvalid            => MAC_CONV_BVALID,
-        m_axi_arready           => MAC_CONV_ARREADY,
-        m_axi_rdata             => MAC_CONV_RDATA,
-        m_axi_rresp             => MAC_CONV_RRESP,
-        m_axi_rvalid            => MAC_CONV_RVALID,
+        m_axi_awready           => MAC_CONV.AWREADY,
+        m_axi_wready            => MAC_CONV.WREADY,
+        m_axi_bresp             => MAC_CONV.BRESP,
+        m_axi_bvalid            => MAC_CONV.BVALID,
+        m_axi_arready           => MAC_CONV.ARREADY,
+        m_axi_rdata             => MAC_CONV.RDATA,
+        m_axi_rresp             => MAC_CONV.RRESP,
+        m_axi_rvalid            => MAC_CONV.RVALID,
         -- Master AXILITE Out
-        m_axi_awaddr            => CONV_MAC_AWADDR,
-        m_axi_awprot            => CONV_MAC_AWPROT,
-        m_axi_awvalid           => CONV_MAC_AWVALID,
-        m_axi_wdata             => CONV_MAC_WDATA,
-        m_axi_wstrb             => CONV_MAC_WSTRB,
-        m_axi_wvalid            => CONV_MAC_WVALID,
-        m_axi_bready            => CONV_MAC_BREADY,
-        m_axi_araddr            => CONV_MAC_ARADDR,
-        m_axi_arprot            => CONV_MAC_ARPROT,
-        m_axi_arvalid           => CONV_MAC_ARVALID,
-        m_axi_rready            => CONV_MAC_RREADY
+        m_axi_awaddr            => CONV_MAC.AWADDR,
+        m_axi_awprot            => CONV_MAC.AWPROT,
+        m_axi_awvalid           => CONV_MAC.AWVALID,
+        m_axi_wdata             => CONV_MAC.WDATA,
+        m_axi_wstrb             => CONV_MAC.WSTRB,
+        m_axi_wvalid            => CONV_MAC.WVALID,
+        m_axi_bready            => CONV_MAC.BREADY,
+        m_axi_araddr            => CONV_MAC.ARADDR,
+        m_axi_arprot            => CONV_MAC.ARPROT,
+        m_axi_arvalid           => CONV_MAC.ARVALID,
+        m_axi_rready            => CONV_MAC.RREADY
     );
 
     U_MAC : axi_ethernetlite_100_unbuff_mgmt
@@ -201,24 +184,24 @@ begin
         ip2intc_irpt            => open,
 
         -- AXILITE Slave In
-        s_axi_araddr            => CONV_MAC_ARADDR(12 downto 0),
-        s_axi_arvalid           => CONV_MAC_ARVALID,
-        s_axi_awaddr            => CONV_MAC_AWADDR(12 downto 0),
-        s_axi_awvalid           => CONV_MAC_AWVALID,
-        s_axi_bready            => CONV_MAC_BREADY,
-        s_axi_rready            => CONV_MAC_RREADY,
-        s_axi_wdata             => CONV_MAC_WDATA,
-        s_axi_wstrb             => CONV_MAC_WSTRB,
-        s_axi_wvalid            => CONV_MAC_WVALID,
+        s_axi_araddr            => CONV_MAC.ARADDR(12 downto 0),
+        s_axi_arvalid           => CONV_MAC.ARVALID,
+        s_axi_awaddr            => CONV_MAC.AWADDR(12 downto 0),
+        s_axi_awvalid           => CONV_MAC.AWVALID,
+        s_axi_bready            => CONV_MAC.BREADY,
+        s_axi_rready            => CONV_MAC.RREADY,
+        s_axi_wdata             => CONV_MAC.WDATA,
+        s_axi_wstrb             => CONV_MAC.WSTRB,
+        s_axi_wvalid            => CONV_MAC.WVALID,
         -- AXILITE Slave Out
-        s_axi_awready           => MAC_CONV_AWREADY,
-        s_axi_wready            => MAC_CONV_WREADY,
-        s_axi_bresp             => MAC_CONV_BRESP,
-        s_axi_bvalid            => MAC_CONV_BVALID,
-        s_axi_arready           => MAC_CONV_ARREADY,
-        s_axi_rdata             => MAC_CONV_RDATA,
-        s_axi_rresp             => MAC_CONV_RRESP,
-        s_axi_rvalid            => MAC_CONV_RVALID,
+        s_axi_awready           => MAC_CONV.AWREADY,
+        s_axi_wready            => MAC_CONV.WREADY,
+        s_axi_bresp             => MAC_CONV.BRESP,
+        s_axi_bvalid            => MAC_CONV.BVALID,
+        s_axi_arready           => MAC_CONV.ARREADY,
+        s_axi_rdata             => MAC_CONV.RDATA,
+        s_axi_rresp             => MAC_CONV.RRESP,
+        s_axi_rvalid            => MAC_CONV.RVALID,
 
         -- PHY In
         phy_col                 => RMII_MAC_COL,

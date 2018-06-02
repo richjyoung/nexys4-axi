@@ -80,6 +80,52 @@ package axi_types is
         RDATA(31 downto 0)
     );
 
+
+    type T_AXI4LITE_MASTER_SLAVE is record
+        -- Write Address Channel
+        AWVALID                     : std_logic;
+        AWADDR                      : std_logic_vector;
+        AWPROT                      : T_AXI4_PROT;
+        -- Write Data Channel
+        WDATA                       : std_logic_vector;
+        WSTRB                       : std_logic_vector;
+        WVALID                      : std_logic;
+        -- Write Response Channel
+        BREADY                      : std_logic;
+        -- Read Address Channel
+        ARVALID                     : std_logic;
+        ARADDR                      : std_logic_vector;
+        ARPROT                      : T_AXI4_PROT;
+        -- Read Data Channel
+        RREADY                      : std_logic;
+    end record T_AXI4LITE_MASTER_SLAVE;
+
+    subtype T_AXI4LITE_MASTER_SLAVE_32x32 is T_AXI4LITE_MASTER_SLAVE(
+        AWADDR(31 downto 0),
+        WDATA(31 downto 0),
+        WSTRB(3 downto 0),
+        ARADDR(31 downto 0)
+    );
+
+    type T_AXI4LITE_SLAVE_MASTER is record
+        -- Write Address Channel
+        AWREADY                     : std_logic;
+        -- Write Data Channel
+        WREADY                      : std_logic;
+        -- Write Response Channel
+        BRESP                       : T_AXI4_RESP;
+        BVALID                      : std_logic;
+        -- Read Address Channel
+        ARREADY                     : std_logic;
+        -- Read Data Channel
+        RDATA                       : std_logic_vector;
+        RRESP                       : T_AXI4_RESP;
+        RVALID                      : std_logic;
+    end record T_AXI4LITE_SLAVE_MASTER;
+
+    subtype T_AXI4LITE_SLAVE_MASTER_32x32 is T_AXI4LITE_SLAVE_MASTER(
+        RDATA(31 downto 0)
+    );
 end axi_types;
 
 package body axi_types is
