@@ -1,10 +1,5 @@
-set ws [file normalize $::env(WORKSPACE)]
-set top $::env(TOP)
-set part $::env(PART)
-set sim_lib $::env(SIM_LIB)
-set sim_top $::env(SIM_TOP)
-puts "Workspace:  $ws"
-puts "Top Module: $top"
-puts "Part:       $part"
-puts "Sim Lib:    $sim_lib"
-puts "Sim Top:    $sim_top"
+set ::root [pwd]
+set ::top "top_level"
+set ::part "xc7a100tcsg324-1"
+set ::sim_lib "NEXYS4_TB"
+set ::sim_top "nexys4_top_level_tb"

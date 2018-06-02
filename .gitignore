@@ -3,3 +3,8 @@ scratch/
 vivado/
 ip/*_generated/
 .Xil/
+.srcs/
+*.jou
+*.log
+*.str
+usage_statistics_webtalk.*
