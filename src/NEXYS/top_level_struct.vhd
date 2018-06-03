@@ -12,6 +12,13 @@ use xil_defaultlib.components.all;
 --------------------------------------------------------------------------------
 architecture struct of top_level is
 
+    -- Crossbar Mapping
+    -- M00          12      0x00000000      CDMA (Ctrl)
+    -- M01          13      0x00100000      Ethernet
+    -- M02          12      0x00200000      UART
+    -- S00                                  CDMA (DMA)
+    -- S01                                  JTAG
+
     signal CLK                  : std_logic;
     signal CLK_ETH              : std_logic;
     signal CLK_ETH_EXT          : std_logic;
@@ -26,11 +33,19 @@ architecture struct of top_level is
     signal JTAG_XBAR            : T_AXI4_MASTER_SLAVE_32x32;
     signal XBAR_JTAG            : T_AXI4_SLAVE_MASTER_32x32;
 
+    -- CDMA DMA to Crossbar
+    -- signal CDMA_DMA_XBAR        : T_AXI4_MASTER_SLAVE_32x32;
+    -- signal XBAR_CDMA_DMA        : T_AXI4_SLAVE_MASTER_32x32;
+
     -- Crossbar Busses
-    signal XBAR_M_AXI_IN        : T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
-    signal XBAR_M_AXI_OUT       : T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0);
     signal XBAR_S_AXI_IN        : T_AXI4_MASTER_SLAVE_32x32_ARRAY(0 downto 0);
     signal XBAR_S_AXI_OUT       : T_AXI4_SLAVE_MASTER_32x32_ARRAY(0 downto 0);
+    signal XBAR_M_AXI_IN        : T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
+    signal XBAR_M_AXI_OUT       : T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0);
+
+    -- Crossbar to CDMA (Ctrl)
+    -- signal XBAR_CDMA_CTRL       : T_AXI4_MASTER_SLAVE_32x32;
+    -- signal CDMA_CTRL_XBAR       : T_AXI4_SLAVE_MASTER_32x32;
 
     -- Crossbar to Ethernet
     signal XBAR_ETH             : T_AXI4_MASTER_SLAVE_32x32;
@@ -46,20 +61,22 @@ architecture struct of top_level is
 
 begin
 
+    -- XBAR_M_AXI_IN(0)            <= CDMA_CTRL_XBAR;
     XBAR_M_AXI_IN(0)            <= ETH_XBAR;
     XBAR_M_AXI_IN(1)            <= UART_XBAR;
-    XBAR_S_AXI_IN(0)            <= JTAG_XBAR;
+    -- XBAR_CDMA_CTRL              <= XBAR_M_AXI_OUT(0);
     XBAR_ETH                    <= XBAR_M_AXI_OUT(0);
     XBAR_UART                   <= XBAR_M_AXI_OUT(1);
-    XBAR_JTAG                   <= XBAR_S_AXI_OUT(0);
 
+    -- XBAR_S_AXI_IN(0)            <= CDMA_DMA_XBAR;
+    XBAR_S_AXI_IN(0)            <= JTAG_XBAR;
+    -- XBAR_CDMA_DMA               <= XBAR_S_AXI_OUT(0);
+    XBAR_JTAG                   <= XBAR_S_AXI_OUT(0);
+    
     LED(0)                      <= ETH_PHY_nRESET_INT;
     LED(1)                      <= ETH_MAC_IRQ;
     LED(2)                      <= UART_IRQ;
     LED(15 downto 3)            <= (others => '0');
-
-    JTAG_XBAR.AWREGION          <= (others => '0');
-    JTAG_XBAR.ARREGION          <= (others => '0');
 
     ETH_PHY_TXD                 <= RMII_PHY.TXD;
     ETH_PHY_TXEN                <= RMII_PHY.TX_EN;
@@ -81,50 +98,25 @@ begin
         clk_in1                 => CLK100MHZ
     );
 
-    U_JTAG : jtag_axi_m
+    -- U_CDMA : axi_cdma
+    -- port map (
+    --     CLK                     => CLK,
+    --     nRESET                  => nRESET,
+    --     CDMA_IRQ                => open,
+    --     CDMA_TVECT              => open,
+    --     M_AXI_IN                => XBAR_CDMA_DMA,
+    --     M_AXI_OUT               => CDMA_DMA_XBAR,
+    --     S_AXI_IN                => XBAR_CDMA_CTRL,
+    --     S_AXI_OUT               => CDMA_CTRL_XBAR
+    -- );
+
+    U_JTAG : axi_jtag
     port map (
-        aclk                    => CLK,
-        aresetn                 => nRESET,
-        
-        -- AXI Master In
-        m_axi_awready           => XBAR_JTAG.AWREADY,
-        m_axi_wready            => XBAR_JTAG.WREADY,
-        m_axi_bid               => "0",
-        m_axi_bresp             => XBAR_JTAG.BRESP,
-        m_axi_bvalid            => XBAR_JTAG.BVALID,
-        m_axi_arready           => XBAR_JTAG.ARREADY,
-        m_axi_rid               => "0",
-        m_axi_rdata             => XBAR_JTAG.RDATA,
-        m_axi_rresp             => XBAR_JTAG.RRESP,
-        m_axi_rlast             => XBAR_JTAG.RLAST,
-        m_axi_rvalid            => XBAR_JTAG.RVALID,
-        -- AXI Master Out
-        m_axi_awid              => JTAG_XBAR.AWID(0 downto 0),
-        m_axi_awaddr            => JTAG_XBAR.AWADDR,
-        m_axi_awlen             => JTAG_XBAR.AWLEN,
-        m_axi_awsize            => JTAG_XBAR.AWSIZE,
-        m_axi_awburst           => JTAG_XBAR.AWBURST,
-        m_axi_awlock            => JTAG_XBAR.AWLOCK,
-        m_axi_awcache           => JTAG_XBAR.AWCACHE,
-        m_axi_awprot            => JTAG_XBAR.AWPROT,
-        m_axi_awqos             => JTAG_XBAR.AWQOS,
-        m_axi_awvalid           => JTAG_XBAR.AWVALID,
-        m_axi_wdata             => JTAG_XBAR.WDATA,
-        m_axi_wstrb             => JTAG_XBAR.WSTRB,
-        m_axi_wlast             => JTAG_XBAR.WLAST,
-        m_axi_wvalid            => JTAG_XBAR.WVALID,
-        m_axi_bready            => JTAG_XBAR.BREADY,
-        m_axi_arid              => JTAG_XBAR.ARID(0 downto 0),
-        m_axi_araddr            => JTAG_XBAR.ARADDR,
-        m_axi_arlen             => JTAG_XBAR.ARLEN,
-        m_axi_arsize            => JTAG_XBAR.ARSIZE,
-        m_axi_arburst           => JTAG_XBAR.ARBURST,
-        m_axi_arlock            => JTAG_XBAR.ARLOCK,
-        m_axi_arcache           => JTAG_XBAR.ARCACHE,
-        m_axi_arprot            => JTAG_XBAR.ARPROT,
-        m_axi_arqos             => JTAG_XBAR.ARQOS,
-        m_axi_arvalid           => JTAG_XBAR.ARVALID,
-        m_axi_rready            => JTAG_XBAR.RREADY
+        CLK                     => CLK,
+        nRESET                  => nRESET,
+        -- AXI Master
+        M_AXI_IN                => XBAR_JTAG,
+        M_AXI_OUT               => JTAG_XBAR
     );
 
     U_XBAR: axi_crossbar
@@ -142,8 +134,8 @@ begin
         CLK                     => CLK,
         nRESET                  => nRESET,
         CLK_ETH                 => CLK_ETH,
-        ETH_PHY_nRESET          => ETH_PHY_nRESET,
-        ETH_MAC_IRQ             => open,
+        ETH_PHY_nRESET          => ETH_PHY_nRESET_INT,
+        ETH_MAC_IRQ             => ETH_MAC_IRQ,
         RMII_IN                 => PHY_RMII,
         RMII_OUT                => RMII_PHY,
         MDIO                    => ETH_PHY_MDIO,

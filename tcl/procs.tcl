@@ -74,7 +74,8 @@ proc run_synth {} {
     write_hwdef -force -file "$::root/output/$::top/$::top.hdf"
     set_property top $::top [current_fileset]
     update_compile_order
-    synth_design -top $::top -part $::part -fsm_extraction auto -resource_sharing on
+    #synth_design -top $::top -part $::part -fsm_extraction auto -resource_sharing on
+    synth_design -top $::top -part $::part -directive RunTimeOptimized
     write_edif -force "$::root/output/$::top/$::top.edn"
     report_utilization -file "$::root/output/$::top/reports/post_synth_util.rpt"
     report_utilization -hierarchical -file "$::root/output/$::top/reports/post_synth_util_hier.rpt"

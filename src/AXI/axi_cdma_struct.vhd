@@ -14,6 +14,15 @@ architecture struct of axi_cdma is
 
 begin
 
+    M_AXI_OUT.AWID              <= (others => '0');
+    M_AXI_OUT.AWLOCK            <= '0';
+    M_AXI_OUT.AWQOS             <= (others => '0');
+    M_AXI_OUT.AWREGION          <= (others => '0');
+    M_AXI_OUT.ARID              <= (others => '0');
+    M_AXI_OUT.ARLOCK            <= '0';
+    M_AXI_OUT.ARQOS             <= (others => '0');
+    M_AXI_OUT.ARREGION          <= (others => '0');
+
     S_AXI_OUT.BID               <= (others => '0');
     S_AXI_OUT.RID               <= (others => '0');
 
@@ -93,12 +102,12 @@ begin
 
         -- Slave AXI Lite In
         s_axi_lite_awvalid      => CONV_CDMA.AWVALID,
-        s_axi_lite_awaddr       => CONV_CDMA.AWADDR,
+        s_axi_lite_awaddr       => CONV_CDMA.AWADDR(5 downto 0),
         s_axi_lite_wdata        => CONV_CDMA.WDATA,
         s_axi_lite_wvalid       => CONV_CDMA.WVALID,
         s_axi_lite_bready       => CONV_CDMA.BREADY,
         s_axi_lite_arvalid      => CONV_CDMA.ARVALID,
-        s_axi_lite_araddr       => CONV_CDMA.ARADDR,
+        s_axi_lite_araddr       => CONV_CDMA.ARADDR(5 downto 0),
         s_axi_lite_rready       => CONV_CDMA.RREADY,
 
         -- Slave AXI Lite Out
