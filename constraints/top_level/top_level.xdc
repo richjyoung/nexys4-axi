@@ -46,3 +46,17 @@ set_property PACKAGE_PIN D5 [get_ports ETH_PHY_CLK]
 ##Bank = 16, Pin name = IO_L12P_T1_MRCC_16,					Sch name = ETH_INTN
 # set_property PACKAGE_PIN B8 [get_ports ETH_INTN]					
 # 	set_property IOSTANDARD LVCMOS33 [get_ports ETH_INTN]
+
+##USB-RS232 Interface
+##Bank = 35, Pin name = IO_L7P_T1_AD6P_35,					Sch name = UART_TXD_IN
+set_property PACKAGE_PIN C4 [get_ports UART_RX]						
+	set_property IOSTANDARD LVCMOS33 [get_ports UART_RX]
+##Bank = 35, Pin name = IO_L11N_T1_SRCC_35,					Sch name = UART_RXD_OUT
+set_property PACKAGE_PIN D4 [get_ports UART_TX]						
+	set_property IOSTANDARD LVCMOS33 [get_ports UART_TX]
+##Bank = 35, Pin name = IO_L12N_T1_MRCC_35,					Sch name = UART_CTS
+#set_property PACKAGE_PIN D3 [get_ports RsCts]						
+	#set_property IOSTANDARD LVCMOS33 [get_ports RsCts]
+##Bank = 35, Pin name = IO_L5N_T0_AD13N_35,					Sch name = UART_RTS
+#set_property PACKAGE_PIN E5 [get_ports RsRts]						
+	#set_property IOSTANDARD LVCMOS33 [get_ports RsRts]

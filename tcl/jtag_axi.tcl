@@ -1,6 +1,6 @@
 proc rd_rx_ping_ctrl {} {
-    create_hw_axi_txn rd_txn [get_hw_axis hw_axi_1] -address 000017fc -len 1 -type read -quiet -force
-    run_hw_axi rd_txn
+    create_hw_axi_txn rd_txn [get_hw_axis hw_axi_1] -address 000017fc -len 1 -type read -verbose -force
+    run_hw_axi rd_txn -verbose
     return [get_property DATA [get_hw_axi_txns rd_txn]]
 }
 
@@ -33,4 +33,21 @@ proc print_eth_hdr {} {
     puts "IP Ver:    $ipver"
     set iplen [string range $raw 3 3]
     puts "IP Length: $iplen"
+}
+
+proc rd_uart_rx {} {
+    create_hw_axi_txn rd_txn [get_hw_axis hw_axi_1] -address 00100000 -len 4 -type read -quiet -force
+    run_hw_axi rd_txn
+    return [get_property DATA [get_hw_axi_txns rd_txn]]
+}
+
+proc rd_uart_rx_stat {} {
+    create_hw_axi_txn rd_txn [get_hw_axis hw_axi_1] -address 00100008 -len 1 -type read -quiet -force
+    run_hw_axi rd_txn
+    return [get_property DATA [get_hw_axi_txns rd_txn]]
+}
+
+proc wr_uart_tx_a {} {
+    create_hw_axi_txn wr_txn [get_hw_axis hw_axi_1] -address 00100004 -len 1 -data 00000041 -type write -quiet -force
+    run_hw_axi wr_txn
 }

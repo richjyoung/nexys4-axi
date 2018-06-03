@@ -17,7 +17,7 @@ package body functions is
         return slv((((slv'length / count) * (index + 1)) - 1) downto ((slv'length / count) * index));
     end function demux;
 
-    function demux(slv : std_logic_vector; index : natural; count : natural) return std_logic_vector is
+    function demux(slv : std_logic_vector; index : natural; count : natural) return std_logic is
     begin
         return slv(index);
     end function demux;

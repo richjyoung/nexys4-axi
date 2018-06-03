@@ -23,6 +23,9 @@ architecture struct of axi_ethernet_rmii is
 
 begin
 
+    S_AXI_OUT.BID               <= (others => '0');
+    S_AXI_OUT.RID               <= (others => '0');
+
     U_CONV : axi_s_to_axilite_m_32x32_conv
     port map (
         aclk                    => CLK,
@@ -93,7 +96,7 @@ begin
     PORT MAP (
         s_axi_aclk              => CLK,
         s_axi_aresetn           => nRESET,
-        ip2intc_irpt            => open,
+        ip2intc_irpt            => ETH_MAC_IRQ,
 
         -- AXILITE Slave In
         s_axi_araddr            => CONV_MAC.ARADDR(12 downto 0),

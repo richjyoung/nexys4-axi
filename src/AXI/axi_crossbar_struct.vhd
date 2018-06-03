@@ -47,45 +47,49 @@ architecture struct of axi_crossbar is
 
 begin
 
-    -- Multiplex input signals
-    M_AXI_AWREADY                   <= M_AXI_IN(1).AWREADY  & M_AXI_IN(0).AWREADY;
-    M_AXI_WREADY                    <= M_AXI_IN(1).WREADY   & M_AXI_IN(0).WREADY;
-    M_AXI_BRESP                     <= M_AXI_IN(1).BRESP    & M_AXI_IN(0).BRESP;
-    M_AXI_BVALID                    <= M_AXI_IN(1).BVALID   & M_AXI_IN(0).BVALID;
-    M_AXI_ARREADY                   <= M_AXI_IN(1).ARREADY  & M_AXI_IN(0).ARREADY;
-    M_AXI_RDATA                     <= M_AXI_IN(1).RDATA    & M_AXI_IN(0).RDATA;
-    M_AXI_RRESP                     <= M_AXI_IN(1).RRESP    & M_AXI_IN(0).RRESP;
-    M_AXI_RLAST                     <= M_AXI_IN(1).RLAST    & M_AXI_IN(0).RLAST;
-    M_AXI_RVALID                    <= M_AXI_IN(1).RVALID   & M_AXI_IN(0).RVALID;
+    S_AXI_OUT.BID               <= (others => '0');
+    S_AXI_OUT.RID               <= (others => '0');
 
-    -- Demultiplex signals for output
+    M_AXI_AWREADY                   <= M_AXI_IN(1).AWREADY & M_AXI_IN(0).AWREADY;
+    M_AXI_WREADY                    <= M_AXI_IN(1).WREADY & M_AXI_IN(0).WREADY;
+    M_AXI_BRESP                     <= M_AXI_IN(1).BRESP & M_AXI_IN(0).BRESP;
+    M_AXI_BVALID                    <= M_AXI_IN(1).BVALID & M_AXI_IN(0).BVALID;
+    M_AXI_ARREADY                   <= M_AXI_IN(1).ARREADY & M_AXI_IN(0).ARREADY;
+    M_AXI_RDATA                     <= M_AXI_IN(1).RDATA & M_AXI_IN(0).RDATA;
+    M_AXI_RRESP                     <= M_AXI_IN(1).RRESP & M_AXI_IN(0).RRESP;
+    M_AXI_RLAST                     <= M_AXI_IN(1).RLAST & M_AXI_IN(0).RLAST;
+    M_AXI_RVALID                    <= M_AXI_IN(1).RVALID & M_AXI_IN(0).RVALID;
+
     G_DEMUX: for I in 0 to (M_AXI_OUT'length - 1) generate
-        M_AXI_OUT(I).AWADDR         <= demux(M_AXI_AWADDR, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWLEN          <= demux(M_AXI_AWLEN, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWSIZE         <= demux(M_AXI_AWSIZE, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWBURST        <= demux(M_AXI_AWBURST, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWLOCK         <= demux(M_AXI_AWLOCK, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWCACHE        <= demux(M_AXI_AWCACHE, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWPROT         <= demux(M_AXI_AWPROT, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWREGION       <= demux(M_AXI_AWREGION, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWQOS          <= demux(M_AXI_AWQOS, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).AWVALID        <= demux(M_AXI_AWVALID, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).WDATA          <= demux(M_AXI_WDATA, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).WSTRB          <= demux(M_AXI_WSTRB, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).WLAST          <= demux(M_AXI_WLAST, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).WVALID         <= demux(M_AXI_WVALID, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).BREADY         <= demux(M_AXI_BREADY, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARADDR         <= demux(M_AXI_ARADDR, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARLEN          <= demux(M_AXI_ARLEN, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARSIZE         <= demux(M_AXI_ARSIZE, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARBURST        <= demux(M_AXI_ARBURST, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARLOCK         <= demux(M_AXI_ARLOCK, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARCACHE        <= demux(M_AXI_ARCACHE, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARPROT         <= demux(M_AXI_ARPROT, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARREGION       <= demux(M_AXI_ARREGION, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARQOS          <= demux(M_AXI_ARQOS, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).ARVALID        <= demux(M_AXI_ARVALID, I, M_AXI_OUT'length);
-        M_AXI_OUT(I).RREADY         <= demux(M_AXI_RREADY, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWID          <= (others => '0');
+        M_AXI_OUT(I).ARID          <= (others => '0');
+
+        M_AXI_OUT(I).AWADDR        <= demux(M_AXI_AWADDR, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWLEN         <= demux(M_AXI_AWLEN, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWSIZE        <= demux(M_AXI_AWSIZE, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWBURST       <= demux(M_AXI_AWBURST, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWLOCK        <= demux(M_AXI_AWLOCK, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWCACHE       <= demux(M_AXI_AWCACHE, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWPROT        <= demux(M_AXI_AWPROT, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWREGION      <= demux(M_AXI_AWREGION, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWQOS         <= demux(M_AXI_AWQOS, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).AWVALID       <= demux(M_AXI_AWVALID, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).WDATA         <= demux(M_AXI_WDATA, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).WSTRB         <= demux(M_AXI_WSTRB, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).WLAST         <= demux(M_AXI_WLAST, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).WVALID        <= demux(M_AXI_WVALID, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).BREADY        <= demux(M_AXI_BREADY, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARADDR        <= demux(M_AXI_ARADDR, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARLEN         <= demux(M_AXI_ARLEN, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARSIZE        <= demux(M_AXI_ARSIZE, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARBURST       <= demux(M_AXI_ARBURST, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARLOCK        <= demux(M_AXI_ARLOCK, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARCACHE       <= demux(M_AXI_ARCACHE, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARPROT        <= demux(M_AXI_ARPROT, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARREGION      <= demux(M_AXI_ARREGION, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARQOS         <= demux(M_AXI_ARQOS, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).ARVALID       <= demux(M_AXI_ARVALID, I, M_AXI_OUT'length);
+        M_AXI_OUT(I).RREADY        <= demux(M_AXI_RREADY, I, M_AXI_OUT'length);
     end generate G_DEMUX;
 
     U_CROSSBAR : axi_crossbar_1x2_32x32

@@ -21,14 +21,32 @@ architecture struct of top_level is
     signal RMII_PHY             : T_ETH_RMII_MAC_PHY;
     signal PHY_RMII             : T_ETH_RMII_PHY_MAC;
 
-    -- JTAG to Ethernet
-    signal JTAG_ETH            : T_AXI4_MASTER_SLAVE_32x32;
-    signal ETH_JTAG            : T_AXI4_SLAVE_MASTER_32x32;
+    -- JTAG to Crossbar
+    signal JTAG_XBAR            : T_AXI4_MASTER_SLAVE_32x32;
+    signal XBAR_JTAG            : T_AXI4_SLAVE_MASTER_32x32;
+
+    -- Crossbar Busses
+    signal XBAR_M_AXI_IN        : T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
+    signal XBAR_M_AXI_OUT       : T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0);
+
+    -- Crossbar to Ethernet
+    signal XBAR_ETH             : T_AXI4_MASTER_SLAVE_32x32;
+    signal ETH_XBAR             : T_AXI4_SLAVE_MASTER_32x32;
+
+    -- Crossbar to UART
+    signal XBAR_UART            : T_AXI4_MASTER_SLAVE_32x32;
+    signal UART_XBAR            : T_AXI4_SLAVE_MASTER_32x32;
 
 begin
 
-    JTAG_ETH.AWREGION          <= (others => '0');
-    JTAG_ETH.ARREGION          <= (others => '0');
+    XBAR_M_AXI_IN(0)            <= ETH_XBAR;
+    XBAR_M_AXI_IN(1)            <= UART_XBAR;
+    XBAR_ETH                    <= XBAR_M_AXI_OUT(0);
+    XBAR_UART                   <= XBAR_M_AXI_OUT(1);
+    
+
+    JTAG_XBAR.AWREGION          <= (others => '0');
+    JTAG_XBAR.ARREGION          <= (others => '0');
 
     ETH_PHY_TXD                 <= RMII_PHY.TXD;
     ETH_PHY_TXEN                <= RMII_PHY.TX_EN;
@@ -55,44 +73,54 @@ begin
         aresetn                 => nRESET,
         
         -- AXI Master In
-        m_axi_awready           => ETH_JTAG.AWREADY,
-        m_axi_wready            => ETH_JTAG.WREADY,
+        m_axi_awready           => XBAR_JTAG.AWREADY,
+        m_axi_wready            => XBAR_JTAG.WREADY,
         m_axi_bid               => "0",
-        m_axi_bresp             => ETH_JTAG.BRESP,
-        m_axi_bvalid            => ETH_JTAG.BVALID,
-        m_axi_arready           => ETH_JTAG.ARREADY,
+        m_axi_bresp             => XBAR_JTAG.BRESP,
+        m_axi_bvalid            => XBAR_JTAG.BVALID,
+        m_axi_arready           => XBAR_JTAG.ARREADY,
         m_axi_rid               => "0",
-        m_axi_rdata             => ETH_JTAG.RDATA,
-        m_axi_rresp             => ETH_JTAG.RRESP,
-        m_axi_rlast             => ETH_JTAG.RLAST,
-        m_axi_rvalid            => ETH_JTAG.RVALID,
+        m_axi_rdata             => XBAR_JTAG.RDATA,
+        m_axi_rresp             => XBAR_JTAG.RRESP,
+        m_axi_rlast             => XBAR_JTAG.RLAST,
+        m_axi_rvalid            => XBAR_JTAG.RVALID,
         -- AXI Master Out
-        m_axi_awid              => open,
-        m_axi_awaddr            => JTAG_ETH.AWADDR,
-        m_axi_awlen             => JTAG_ETH.AWLEN,
-        m_axi_awsize            => JTAG_ETH.AWSIZE,
-        m_axi_awburst           => JTAG_ETH.AWBURST,
-        m_axi_awlock            => JTAG_ETH.AWLOCK,
-        m_axi_awcache           => JTAG_ETH.AWCACHE,
-        m_axi_awprot            => JTAG_ETH.AWPROT,
-        m_axi_awqos             => JTAG_ETH.AWQOS,
-        m_axi_awvalid           => JTAG_ETH.AWVALID,
-        m_axi_wdata             => JTAG_ETH.WDATA,
-        m_axi_wstrb             => JTAG_ETH.WSTRB,
-        m_axi_wlast             => JTAG_ETH.WLAST,
-        m_axi_wvalid            => JTAG_ETH.WVALID,
-        m_axi_bready            => JTAG_ETH.BREADY,
-        m_axi_arid              => open,
-        m_axi_araddr            => JTAG_ETH.ARADDR,
-        m_axi_arlen             => JTAG_ETH.ARLEN,
-        m_axi_arsize            => JTAG_ETH.ARSIZE,
-        m_axi_arburst           => JTAG_ETH.ARBURST,
-        m_axi_arlock            => JTAG_ETH.ARLOCK,
-        m_axi_arcache           => JTAG_ETH.ARCACHE,
-        m_axi_arprot            => JTAG_ETH.ARPROT,
-        m_axi_arqos             => JTAG_ETH.ARQOS,
-        m_axi_arvalid           => JTAG_ETH.ARVALID,
-        m_axi_rready            => JTAG_ETH.RREADY
+        m_axi_awid              => JTAG_XBAR.AWID(0 downto 0),
+        m_axi_awaddr            => JTAG_XBAR.AWADDR,
+        m_axi_awlen             => JTAG_XBAR.AWLEN,
+        m_axi_awsize            => JTAG_XBAR.AWSIZE,
+        m_axi_awburst           => JTAG_XBAR.AWBURST,
+        m_axi_awlock            => JTAG_XBAR.AWLOCK,
+        m_axi_awcache           => JTAG_XBAR.AWCACHE,
+        m_axi_awprot            => JTAG_XBAR.AWPROT,
+        m_axi_awqos             => JTAG_XBAR.AWQOS,
+        m_axi_awvalid           => JTAG_XBAR.AWVALID,
+        m_axi_wdata             => JTAG_XBAR.WDATA,
+        m_axi_wstrb             => JTAG_XBAR.WSTRB,
+        m_axi_wlast             => JTAG_XBAR.WLAST,
+        m_axi_wvalid            => JTAG_XBAR.WVALID,
+        m_axi_bready            => JTAG_XBAR.BREADY,
+        m_axi_arid              => JTAG_XBAR.ARID(0 downto 0),
+        m_axi_araddr            => JTAG_XBAR.ARADDR,
+        m_axi_arlen             => JTAG_XBAR.ARLEN,
+        m_axi_arsize            => JTAG_XBAR.ARSIZE,
+        m_axi_arburst           => JTAG_XBAR.ARBURST,
+        m_axi_arlock            => JTAG_XBAR.ARLOCK,
+        m_axi_arcache           => JTAG_XBAR.ARCACHE,
+        m_axi_arprot            => JTAG_XBAR.ARPROT,
+        m_axi_arqos             => JTAG_XBAR.ARQOS,
+        m_axi_arvalid           => JTAG_XBAR.ARVALID,
+        m_axi_rready            => JTAG_XBAR.RREADY
+    );
+
+    U_XBAR: axi_crossbar
+    port map (
+        CLK                     => CLK,
+        nRESET                  => nRESET,
+        S_AXI_IN                => JTAG_XBAR,
+        S_AXI_OUT               => XBAR_JTAG,
+        M_AXI_IN                => XBAR_M_AXI_IN,
+        M_AXI_OUT               => XBAR_M_AXI_OUT
     );
 
     U_ETH: axi_ethernet_rmii
@@ -106,8 +134,18 @@ begin
         RMII_OUT                => RMII_PHY,
         MDIO                    => ETH_PHY_MDIO,
         MDC                     => ETH_PHY_MDC,
-        S_AXI_IN                => JTAG_ETH,
-        S_AXI_OUT               => ETH_JTAG
+        S_AXI_IN                => XBAR_ETH,
+        S_AXI_OUT               => ETH_XBAR
+    );
+
+    U_UART: axi_UART
+    port map (
+        CLK                     => CLK,
+        nRESET                  => nRESET,
+        UART_RX                 => UART_RX,
+        UART_TX                 => UART_TX,
+        S_AXI_IN                => XBAR_UART,
+        S_AXI_OUT               => UART_XBAR
     );
 end struct;
 --------------------------------------------------------------------------------

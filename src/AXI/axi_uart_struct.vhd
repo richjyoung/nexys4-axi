@@ -14,6 +14,9 @@ architecture struct of axi_uart is
 
 begin
 
+    S_AXI_OUT.BID               <= (others => '0');
+    S_AXI_OUT.RID               <= (others => '0');
+
     U_CONV : axi_s_to_axilite_m_32x32_conv
     port map (
         aclk                    => CLK,
@@ -86,14 +89,14 @@ begin
         s_axi_aresetn           => nRESET,
 
         -- Slave AXILITE In
-        s_axi_awaddr            => CONV_UART.AWADDR,
+        s_axi_awaddr            => CONV_UART.AWADDR(3 downto 0),
         s_axi_awvalid           => CONV_UART.AWVALID,
         s_axi_wdata             => CONV_UART.WDATA,
         s_axi_wstrb             => CONV_UART.WSTRB,
         s_axi_wvalid            => CONV_UART.WVALID,
         s_axi_bready            => CONV_UART.BREADY,
         s_axi_arvalid           => CONV_UART.ARVALID,
-        s_axi_araddr            => CONV_UART.ARADDR,
+        s_axi_araddr            => CONV_UART.ARADDR(3 downto 0),
         s_axi_rready            => CONV_UART.RREADY,
         -- Slave AXILITE Out
         s_axi_awready           => UART_CONV.AWREADY,

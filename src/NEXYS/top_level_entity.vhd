@@ -19,6 +19,10 @@ entity top_level is
         ETH_PHY_CLK         : out   std_logic;
         ETH_PHY_nRESET      : out   std_logic;
         ETH_PHY_TXD         : out   std_logic_vector(1 downto 0);
-        ETH_PHY_TXEN        : out   std_logic
+        ETH_PHY_TXEN        : out   std_logic;
+
+        -- UART
+        UART_RX             : in    std_logic;
+        UART_TX             : out   std_logic
     );
 end top_level;
