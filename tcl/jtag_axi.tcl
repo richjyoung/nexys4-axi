@@ -52,4 +52,10 @@ proc wr_uart_tx_a {} {
     run_hw_axi wr_txn
 }
 
+proc rd_cdma_stat {} {
+    create_hw_axi_txn rd_txn [get_hw_axis hw_axi_1] -address 00200004 -len 1 -type read -quiet -force
+    run_hw_axi rd_txn
+    return [get_property DATA [get_hw_axi_txns rd_txn]]
+}
+
 print_eth_hdr

@@ -34,18 +34,18 @@ architecture struct of top_level is
     signal XBAR_JTAG            : T_AXI4_SLAVE_MASTER_32x32;
 
     -- CDMA DMA to Crossbar
-    -- signal CDMA_DMA_XBAR        : T_AXI4_MASTER_SLAVE_32x32;
-    -- signal XBAR_CDMA_DMA        : T_AXI4_SLAVE_MASTER_32x32;
+    signal CDMA_DMA_XBAR        : T_AXI4_MASTER_SLAVE_32x32;
+    signal XBAR_CDMA_DMA        : T_AXI4_SLAVE_MASTER_32x32;
 
     -- Crossbar Busses
-    signal XBAR_S_AXI_IN        : T_AXI4_MASTER_SLAVE_32x32_ARRAY(0 downto 0);
-    signal XBAR_S_AXI_OUT       : T_AXI4_SLAVE_MASTER_32x32_ARRAY(0 downto 0);
-    signal XBAR_M_AXI_IN        : T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
-    signal XBAR_M_AXI_OUT       : T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0);
+    signal XBAR_S_AXI_IN        : T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0);
+    signal XBAR_S_AXI_OUT       : T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
+    signal XBAR_M_AXI_IN        : T_AXI4_SLAVE_MASTER_32x32_ARRAY(2 downto 0);
+    signal XBAR_M_AXI_OUT       : T_AXI4_MASTER_SLAVE_32x32_ARRAY(2 downto 0);
 
     -- Crossbar to CDMA (Ctrl)
-    -- signal XBAR_CDMA_CTRL       : T_AXI4_MASTER_SLAVE_32x32;
-    -- signal CDMA_CTRL_XBAR       : T_AXI4_SLAVE_MASTER_32x32;
+    signal XBAR_CDMA_CTRL       : T_AXI4_MASTER_SLAVE_32x32;
+    signal CDMA_CTRL_XBAR       : T_AXI4_SLAVE_MASTER_32x32;
 
     -- Crossbar to Ethernet
     signal XBAR_ETH             : T_AXI4_MASTER_SLAVE_32x32;
@@ -61,17 +61,17 @@ architecture struct of top_level is
 
 begin
 
-    -- XBAR_M_AXI_IN(0)            <= CDMA_CTRL_XBAR;
     XBAR_M_AXI_IN(0)            <= ETH_XBAR;
     XBAR_M_AXI_IN(1)            <= UART_XBAR;
-    -- XBAR_CDMA_CTRL              <= XBAR_M_AXI_OUT(0);
+    XBAR_M_AXI_IN(2)            <= CDMA_CTRL_XBAR;
     XBAR_ETH                    <= XBAR_M_AXI_OUT(0);
     XBAR_UART                   <= XBAR_M_AXI_OUT(1);
+    XBAR_CDMA_CTRL              <= XBAR_M_AXI_OUT(2);
 
-    -- XBAR_S_AXI_IN(0)            <= CDMA_DMA_XBAR;
     XBAR_S_AXI_IN(0)            <= JTAG_XBAR;
-    -- XBAR_CDMA_DMA               <= XBAR_S_AXI_OUT(0);
+    XBAR_S_AXI_IN(1)            <= CDMA_DMA_XBAR;
     XBAR_JTAG                   <= XBAR_S_AXI_OUT(0);
+    XBAR_CDMA_DMA               <= XBAR_S_AXI_OUT(1);
     
     LED(0)                      <= ETH_PHY_nRESET_INT;
     LED(1)                      <= ETH_MAC_IRQ;
@@ -98,17 +98,17 @@ begin
         clk_in1                 => CLK100MHZ
     );
 
-    -- U_CDMA : axi_cdma
-    -- port map (
-    --     CLK                     => CLK,
-    --     nRESET                  => nRESET,
-    --     CDMA_IRQ                => open,
-    --     CDMA_TVECT              => open,
-    --     M_AXI_IN                => XBAR_CDMA_DMA,
-    --     M_AXI_OUT               => CDMA_DMA_XBAR,
-    --     S_AXI_IN                => XBAR_CDMA_CTRL,
-    --     S_AXI_OUT               => CDMA_CTRL_XBAR
-    -- );
+    U_CDMA : axi_cdma
+    port map (
+        CLK                     => CLK,
+        nRESET                  => nRESET,
+        CDMA_IRQ                => open,
+        CDMA_TVECT              => open,
+        M_AXI_IN                => XBAR_CDMA_DMA,
+        M_AXI_OUT               => CDMA_DMA_XBAR,
+        S_AXI_IN                => XBAR_CDMA_CTRL,
+        S_AXI_OUT               => CDMA_CTRL_XBAR
+    );
 
     U_JTAG : axi_jtag
     port map (

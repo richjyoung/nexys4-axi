@@ -178,7 +178,7 @@ begin
         S_AXI_OUT(I).RVALID         <= demux(S_AXI_RVALID, I, C_S);
     end generate G_S;
 
-    U_XBAR : axi_crossbar_1x2_32x32
+    U_XBAR : axi_crossbar_2x3_32x32
     port map (
         aclk => CLK,
         aresetn => nRESET,
