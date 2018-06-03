@@ -29,6 +29,8 @@ architecture struct of top_level is
     -- Crossbar Busses
     signal XBAR_M_AXI_IN        : T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
     signal XBAR_M_AXI_OUT       : T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0);
+    signal XBAR_S_AXI_IN        : T_AXI4_MASTER_SLAVE_32x32_ARRAY(0 downto 0);
+    signal XBAR_S_AXI_OUT       : T_AXI4_SLAVE_MASTER_32x32_ARRAY(0 downto 0);
 
     -- Crossbar to Ethernet
     signal XBAR_ETH             : T_AXI4_MASTER_SLAVE_32x32;
@@ -46,8 +48,10 @@ begin
 
     XBAR_M_AXI_IN(0)            <= ETH_XBAR;
     XBAR_M_AXI_IN(1)            <= UART_XBAR;
+    XBAR_S_AXI_IN(0)            <= JTAG_XBAR;
     XBAR_ETH                    <= XBAR_M_AXI_OUT(0);
     XBAR_UART                   <= XBAR_M_AXI_OUT(1);
+    XBAR_JTAG                   <= XBAR_S_AXI_OUT(0);
 
     LED(0)                      <= ETH_PHY_nRESET_INT;
     LED(1)                      <= ETH_MAC_IRQ;
@@ -127,8 +131,8 @@ begin
     port map (
         CLK                     => CLK,
         nRESET                  => nRESET,
-        S_AXI_IN                => JTAG_XBAR,
-        S_AXI_OUT               => XBAR_JTAG,
+        S_AXI_IN                => XBAR_S_AXI_IN,
+        S_AXI_OUT               => XBAR_S_AXI_OUT,
         M_AXI_IN                => XBAR_M_AXI_IN,
         M_AXI_OUT               => XBAR_M_AXI_OUT
     );

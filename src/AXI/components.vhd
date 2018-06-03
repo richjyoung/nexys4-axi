@@ -12,8 +12,8 @@ package components is
             CLK                 : in  std_logic;
             nRESET              : in  std_logic;
             -- AXI Slave Interface
-            S_AXI_IN            : in  T_AXI4_MASTER_SLAVE_32x32;
-            S_AXI_OUT           : out T_AXI4_SLAVE_MASTER_32x32;
+            S_AXI_IN            : in  T_AXI4_MASTER_SLAVE_32x32_ARRAY(0 downto 0);
+            S_AXI_OUT           : out T_AXI4_SLAVE_MASTER_32x32_ARRAY(0 downto 0);
             -- AXI Master Interfaces
             M_AXI_IN            : in  T_AXI4_SLAVE_MASTER_32x32_ARRAY(1 downto 0);
             M_AXI_OUT           : out T_AXI4_MASTER_SLAVE_32x32_ARRAY(1 downto 0)

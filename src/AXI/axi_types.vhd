@@ -4,15 +4,25 @@ use IEEE.std_logic_1164.all;
 
 package axi_types is
 
-    subtype T_AXI4_ID is std_logic_vector(7 downto 0);
-    subtype T_AXI4_LEN is std_logic_vector(7 downto 0);
-    subtype T_AXI4_SIZE is std_logic_vector(2 downto 0);
-    subtype T_AXI4_BURST is std_logic_vector(1 downto 0);
-    subtype T_AXI4_CACHE is std_logic_vector(3 downto 0);
-    subtype T_AXI4_PROT is std_logic_vector(2 downto 0);
-    subtype T_AXI4_QOS is std_logic_vector(3 downto 0);
-    subtype T_AXI4_REGION is std_logic_vector(3 downto 0);
-    subtype T_AXI4_RESP is std_logic_vector(1 downto 0);
+    constant C_AXI4_ID_W            : natural := 8;
+    constant C_AXI4_LEN_W           : natural := 8;
+    constant C_AXI4_SIZE_W          : natural := 3;
+    constant C_AXI4_BURST_W         : natural := 2;
+    constant C_AXI4_CACHE_W         : natural := 4;
+    constant C_AXI4_PROT_W          : natural := 3;
+    constant C_AXI4_QOS_W           : natural := 4;
+    constant C_AXI4_REGION_W        : natural := 4;
+    constant C_AXI4_RESP_W          : natural := 2;
+
+    subtype T_AXI4_ID is std_logic_vector(C_AXI4_ID_W - 1 downto 0);
+    subtype T_AXI4_LEN is std_logic_vector(C_AXI4_LEN_W - 1 downto 0);
+    subtype T_AXI4_SIZE is std_logic_vector(C_AXI4_SIZE_W - 1 downto 0);
+    subtype T_AXI4_BURST is std_logic_vector(C_AXI4_BURST_W - 1 downto 0);
+    subtype T_AXI4_CACHE is std_logic_vector(C_AXI4_CACHE_W - 1 downto 0);
+    subtype T_AXI4_PROT is std_logic_vector(C_AXI4_PROT_W - 1 downto 0);
+    subtype T_AXI4_QOS is std_logic_vector(C_AXI4_QOS_W - 1 downto 0);
+    subtype T_AXI4_REGION is std_logic_vector(C_AXI4_REGION_W - 1 downto 0);
+    subtype T_AXI4_RESP is std_logic_vector(C_AXI4_RESP_W - 1 downto 0);
 
     type T_AXI4_MASTER_SLAVE is record
         -- Write Address Channel

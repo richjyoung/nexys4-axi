@@ -4,13 +4,25 @@ use IEEE.numeric_std.all;
 
 package functions is
 
-    function demux(slv : std_logic_vector; index : natural; count : natural) return std_logic_vector;
+    procedure mux(signal dst : out std_logic_vector; src : std_logic_vector; index : natural);
+    procedure mux(signal dst : out std_logic_vector; src : std_logic; index : natural);
 
+    function demux(slv : std_logic_vector; index : natural; count : natural) return std_logic_vector;
     function demux(slv : std_logic_vector; index : natural; count : natural) return std_logic;
 
 end functions;
 
 package body functions is
+
+    procedure mux(signal dst : out std_logic_vector; src : std_logic_vector; index : natural) is
+    begin
+        dst((src'length * (index + 1)) - 1 downto (src'length * index)) <= src;
+    end procedure mux;
+
+    procedure mux(signal dst : out std_logic_vector; src : std_logic; index : natural) is
+    begin
+        dst(index) <= src;
+    end procedure mux;
 
     function demux(slv : std_logic_vector; index : natural; count : natural) return std_logic_vector is
     begin

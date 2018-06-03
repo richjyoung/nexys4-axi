@@ -51,3 +51,5 @@ proc wr_uart_tx_a {} {
     create_hw_axi_txn wr_txn [get_hw_axis hw_axi_1] -address 00100004 -len 1 -data 00000041 -type write -quiet -force
     run_hw_axi wr_txn
 }
+
+print_eth_hdr
