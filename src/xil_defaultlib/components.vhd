@@ -47,6 +47,7 @@ package components is
     PORT (
         aclk : IN STD_LOGIC;
         aresetn : IN STD_LOGIC;
+        s_axi_awid : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
         s_axi_awaddr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         s_axi_awlen : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
         s_axi_awsize : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -63,9 +64,11 @@ package components is
         s_axi_wlast : IN STD_LOGIC;
         s_axi_wvalid : IN STD_LOGIC;
         s_axi_wready : OUT STD_LOGIC;
+        s_axi_bid : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
         s_axi_bresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         s_axi_bvalid : OUT STD_LOGIC;
         s_axi_bready : IN STD_LOGIC;
+        s_axi_arid : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
         s_axi_araddr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         s_axi_arlen : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
         s_axi_arsize : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -77,6 +80,7 @@ package components is
         s_axi_arqos : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
         s_axi_arvalid : IN STD_LOGIC;
         s_axi_arready : OUT STD_LOGIC;
+        s_axi_rid : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
         s_axi_rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         s_axi_rresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         s_axi_rlast : OUT STD_LOGIC;

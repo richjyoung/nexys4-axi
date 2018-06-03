@@ -68,10 +68,10 @@ begin
     XBAR_UART                   <= XBAR_M_AXI_OUT(1);
     XBAR_CDMA_CTRL              <= XBAR_M_AXI_OUT(2);
 
-    XBAR_S_AXI_IN(0)            <= JTAG_XBAR;
-    XBAR_S_AXI_IN(1)            <= CDMA_DMA_XBAR;
-    XBAR_JTAG                   <= XBAR_S_AXI_OUT(0);
-    XBAR_CDMA_DMA               <= XBAR_S_AXI_OUT(1);
+    XBAR_S_AXI_IN(1)            <= JTAG_XBAR;
+    XBAR_S_AXI_IN(0)            <= CDMA_DMA_XBAR;
+    XBAR_JTAG                   <= XBAR_S_AXI_OUT(1);
+    XBAR_CDMA_DMA               <= XBAR_S_AXI_OUT(0);
     
     LED(0)                      <= ETH_PHY_nRESET_INT;
     LED(1)                      <= ETH_MAC_IRQ;

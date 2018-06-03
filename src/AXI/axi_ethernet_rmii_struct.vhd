@@ -23,15 +23,13 @@ architecture struct of axi_ethernet_rmii is
 
 begin
 
-    S_AXI_OUT.BID               <= (others => '0');
-    S_AXI_OUT.RID               <= (others => '0');
-
     U_CONV : axi_s_to_axilite_m_32x32_conv
     port map (
         aclk                    => CLK,
         aresetn                 => nRESET,
 
         -- Slave AXI In
+        s_axi_awid              => S_AXI_IN.AWID,
         s_axi_awaddr            => S_AXI_IN.AWADDR,
         s_axi_awlen             => S_AXI_IN.AWLEN,
         s_axi_awsize            => S_AXI_IN.AWSIZE,
@@ -47,6 +45,7 @@ begin
         s_axi_wlast             => S_AXI_IN.WLAST,
         s_axi_wvalid            => S_AXI_IN.WVALID,
         s_axi_bready            => S_AXI_IN.BREADY,
+        s_axi_arid              => S_AXI_IN.ARID,
         s_axi_araddr            => S_AXI_IN.ARADDR,
         s_axi_arlen             => S_AXI_IN.ARLEN,
         s_axi_arsize            => S_AXI_IN.ARSIZE,
@@ -61,9 +60,11 @@ begin
         -- Slave AXI Out
         s_axi_awready           => S_AXI_OUT.AWREADY,
         s_axi_wready            => S_AXI_OUT.WREADY,
+        s_axi_bid               => S_AXI_OUT.BID,
         s_axi_bresp             => S_AXI_OUT.BRESP,
         s_axi_bvalid            => S_AXI_OUT.BVALID,
         s_axi_arready           => S_AXI_OUT.ARREADY,
+        s_axi_rid               => S_AXI_OUT.RID,
         s_axi_rdata             => S_AXI_OUT.RDATA,
         s_axi_rresp             => S_AXI_OUT.RRESP,
         s_axi_rlast             => S_AXI_OUT.RLAST,
