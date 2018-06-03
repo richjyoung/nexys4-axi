@@ -8,6 +8,9 @@ entity top_level is
         CLK100MHZ           : in    std_logic;
         CPU_RESET           : in    std_logic;
 
+        -- LED
+        LED                 : out   std_logic_vector(15 downto 0);
+
         -- Ethernet MDIO
         ETH_PHY_MDC         : out   std_logic;
         ETH_PHY_MDIO        : inout std_logic;

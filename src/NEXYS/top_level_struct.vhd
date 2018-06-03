@@ -16,6 +16,7 @@ architecture struct of top_level is
     signal CLK_ETH              : std_logic;
     signal CLK_ETH_EXT          : std_logic;
     signal nRESET               : std_logic;
+    signal ETH_PHY_nRESET_INT   : std_logic;
 
     -- RMII Converter/PHY Interface Signals
     signal RMII_PHY             : T_ETH_RMII_MAC_PHY;
@@ -37,13 +38,21 @@ architecture struct of top_level is
     signal XBAR_UART            : T_AXI4_MASTER_SLAVE_32x32;
     signal UART_XBAR            : T_AXI4_SLAVE_MASTER_32x32;
 
+    -- Interrupts
+    signal UART_IRQ             : std_logic;
+    signal ETH_MAC_IRQ          : std_logic;
+
 begin
 
     XBAR_M_AXI_IN(0)            <= ETH_XBAR;
     XBAR_M_AXI_IN(1)            <= UART_XBAR;
     XBAR_ETH                    <= XBAR_M_AXI_OUT(0);
     XBAR_UART                   <= XBAR_M_AXI_OUT(1);
-    
+
+    LED(0)                      <= ETH_PHY_nRESET_INT;
+    LED(1)                      <= ETH_MAC_IRQ;
+    LED(2)                      <= UART_IRQ;
+    LED(15 downto 3)            <= (others => '0');
 
     JTAG_XBAR.AWREGION          <= (others => '0');
     JTAG_XBAR.ARREGION          <= (others => '0');
@@ -53,6 +62,7 @@ begin
     PHY_RMII.CRS_DV             <= ETH_PHY_CRSDV;
     PHY_RMII.RXD                <= ETH_PHY_RXD;
     PHY_RMII.RX_ER              <= ETH_PHY_RXERR;
+    ETH_PHY_nRESET              <= ETH_PHY_nRESET_INT;
 
     U_CLK : clk_100_50_50p45
     port map ( 
@@ -138,10 +148,11 @@ begin
         S_AXI_OUT               => ETH_XBAR
     );
 
-    U_UART: axi_UART
+    U_UART: axi_uart
     port map (
         CLK                     => CLK,
         nRESET                  => nRESET,
+        UART_IRQ                => UART_IRQ,
         UART_RX                 => UART_RX,
         UART_TX                 => UART_TX,
         S_AXI_IN                => XBAR_UART,
